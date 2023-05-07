@@ -1,3 +1,4 @@
+import argparse
 import numpy as np
 import pandas as pd
 import os
@@ -6,11 +7,22 @@ from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, auc, preci
 import matplotlib.pyplot as plt
 from tools import protein_to_onehot
 
-model_filename = os.path.join("model","ACE2_RNN.h5")
-test_filename = os.path.join("data","ACE2_test_data.csv")
+# Define the command-line argument parser
+parser = argparse.ArgumentParser()
+parser.add_argument('--name','-n', default=None, type=str, required=True, help='name of antibody/receptor')
+args = parser.parse_args()
+abname = args.name
+
+model_filename = os.path.join("model",abname+"_RNN.h5")
+test_filename = os.path.join("data",abname+"_test_data.csv")
+onehot_filename = os.path.join("data", abname+"_test_onehot.npy")
+figure_filename = os.path.join('figures',abname+'_test_roc_curve.png')
 
 # Load the saved model
 model = keras.models.load_model(model_filename)
+
+# Print the input shape of the model
+print("input model shape: "+str(model.layers[0].input_shape))
 
 # Load the new data from a CSV file
 new_data = pd.read_csv(test_filename)
@@ -19,7 +31,8 @@ new_data = pd.read_csv(test_filename)
 onehot = np.array([protein_to_onehot(seq) for seq in new_data['junction_aa']])
 
 # Get the true labels for the new data
-true_labels = new_data['Label']
+#true_labels = new_data['Label']
+true_labels = np.array(new_data['Label'].astype('category').cat.codes)
 
 # Make predictions on the new data using the loaded model
 predictions = model.predict(onehot)
@@ -51,4 +64,5 @@ plt.title('Receiver Operating Characteristic (ROC) Curve')
 plt.legend(loc="lower right")
 
 # Save the plot as a PNG file
-plt.savefig('roc_curve.png')
+plt.savefig(figure_filename)
+print("write ROC figure to "+figure_filename)

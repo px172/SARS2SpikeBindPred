@@ -26,34 +26,23 @@ onehot_filename = os.path.join("data", abname+"_train_onehot.npy")  # new line
 
 if os.path.exists(model_filename):
     if args.force:
-        print("Model file exists. Retrain the model.")
+        print("The model file exists. Retrain the model with --force .")
     else:
         overwrite = input("Do you want to retrain the model? Press 'y' to confirm: ")
         if overwrite == "y":
-            print("Model file overwritten.")
+            print("The model file will be overwritten.")
         else:
             print("The model will not be retrained. exit.")
             os._exit(0)
 
-if os.path.exists(onehot_filename):
-    # Load the onehot array from file if it already exists
-    print("use the pre-compiled numpy array: "+onehot_filename)
-    onehot = np.load(onehot_filename)
-else:
-    # Load the data from the CSV file
-    df = pd.read_csv(filename)
+# Load the data from the CSV file
+df = pd.read_csv(filename)
 
-    # Convert the protein sequences to one-hot encoding vectors
-    onehot = np.array([protein_to_onehot(seq) for seq in df['junction_aa']])
-    # Convert the labels to integers
-    labels = np.array(df['Label'].astype('category').cat.codes)
+# Convert the protein sequences to one-hot encoding vectors
+onehot = np.array([protein_to_onehot(seq) for seq in df['junction_aa']])
 
-    # Split the data into training and validation sets
-    X_train, X_val, y_train, y_val = train_test_split(onehot, labels, test_size=0.2, random_state=42)
-
-    # Save the onehot array to file
-    print("save the pre-compiled numpy array: "+onehot_filename)
-    np.save(onehot_filename, onehot)
+# Convert the labels to integers
+labels = np.array(df['Label'].astype('category').cat.codes)
 
 # Split the data into training and validation sets
 X_train, X_val, y_train, y_val = train_test_split(onehot, labels, test_size=0.2, random_state=42)
