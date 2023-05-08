@@ -60,7 +60,7 @@ plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
 plt.plot([0, 1], [0, 1], 'k--')  # diagonal line representing random classification
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
-plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.title('Receiver Operating Characteristic (ROC) Curve of '+abname)
 plt.legend(loc="lower right")
 
 # Save the plot as a PNG file
